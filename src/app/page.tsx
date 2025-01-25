@@ -171,7 +171,7 @@ export default function Page() {
       ? watchedDateRange[1]
       : watchedDateRange[0]!.add(2, 'month')
     ).format('YYYY-MM-DD'),
-    value: Value,
+    value: Value,  // value added here
   });
 
   /**
@@ -382,6 +382,7 @@ export default function Page() {
                     ref={calenderDatesRef}
                     outerRef={mainGridContainerRef}
                     onScroll={handleDatesScroll}
+                    overscanColumnCount={10}
                   >
                     {DateRow}
                   </FixedSizeGrid>

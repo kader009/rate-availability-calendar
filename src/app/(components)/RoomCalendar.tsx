@@ -391,6 +391,7 @@ export default function RoomRateAvailabilityCalendar(props: IProps) {
                 columnCount={props.room_category.inventory_calendar.length}
                 columnWidth={() => 74}
                 rowCount={calendarGridData.length}
+                overscanColumnCount={20}
                 rowHeight={(index: number) => {
                   if (calendarGridData[index].type === "inventory") {
                     return 30;
