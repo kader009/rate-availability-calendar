@@ -37,9 +37,7 @@ import dayjs from 'dayjs';
 import { countDaysByMonth } from '@/utils';
 import RoomRateAvailabilityCalendar from './(components)/RoomCalendar';
 import Navbar from '@/components/Navbar';
-import useRoomRateAvailabilityCalendar, {
-  IRoomCategoryCalender,
-} from './(hooks)/useRoomRateAvailabilityCalendar';
+import useRoomRateAvailabilityCalendar, { IRoomCategoryCalender } from './(hooks)/useRoomRateAvailabilityCalendar';
 
 import InfiniteScroll from 'react-infinite-scroll-component'; // install and import for infinite scroll
 
@@ -175,6 +173,21 @@ export default function Page() {
     ).format('YYYY-MM-DD'),
     value: Value,
   });
+
+  /**
+   * Updates the room data state when new calendar data is successfully fetched.
+   * This effect runs whenever the room calendar query succeeds or when the Value state changes.
+   * 
+   * @effect
+   * @dependencies {boolean} room_calendar.isSuccess - Indicates if the calendar data fetch was successful
+   * @dependencies {object} room_calendar.data - The fetched calendar data containing room categories
+   * @dependencies {string} Value - The current page/offset value for pagination
+   * 
+   * @description
+   * - Checks if the calendar data fetch was successful and contains room categories
+   * - Uses a functional state update to properly merge new room categories with existing ones
+   * - Prevents stale state issues by using the functional update pattern
+   */
 
   useEffect(() => {
     if (room_calendar.isSuccess && room_calendar.data?.data.room_categories) {
@@ -411,6 +424,7 @@ export default function Page() {
               ))}
             </InfiniteScroll>
           )}
+          
         </Card>
       </Box>
       <Box

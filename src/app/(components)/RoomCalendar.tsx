@@ -220,6 +220,7 @@ export default function RoomRateAvailabilityCalendar(props: IProps) {
           "&::-webkit-scrollbar": {
             display: "none",
           },
+          transition:'transform 0.1s ease-in-out'
         }
   );
 
