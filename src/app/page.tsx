@@ -37,7 +37,9 @@ import dayjs from 'dayjs';
 import { countDaysByMonth } from '@/utils';
 import RoomRateAvailabilityCalendar from './(components)/RoomCalendar';
 import Navbar from '@/components/Navbar';
-import useRoomRateAvailabilityCalendar, { IRoomCategoryCalender } from './(hooks)/useRoomRateAvailabilityCalendar';
+import useRoomRateAvailabilityCalendar, {
+  IRoomCategoryCalender,
+} from './(hooks)/useRoomRateAvailabilityCalendar';
 
 import InfiniteScroll from 'react-infinite-scroll-component'; // install and import for infinite scroll
 
@@ -126,9 +128,16 @@ export default function Page() {
         }
       };
       rootContainer.addEventListener('wheel', handler);
+
+      // clean function
       return () => rootContainer.removeEventListener('wheel', handler);
     }
-  });
+  }, [
+    rootContainerRef,
+    mainGridContainerRef,
+    calenderMonthsRef,
+    calenderDatesRef,
+  ]);
 
   // State for calendar dates and months
   const [calenderDates, setCalenderDates] = useState<Array<dayjs.Dayjs>>([]);
@@ -171,18 +180,18 @@ export default function Page() {
       ? watchedDateRange[1]
       : watchedDateRange[0]!.add(2, 'month')
     ).format('YYYY-MM-DD'),
-    value: Value,  // value added here
+    value: Value, // value added here
   });
 
   /**
    * Updates the room data state when new calendar data is successfully fetched.
    * This effect runs whenever the room calendar query succeeds or when the Value state changes.
-   * 
+   *
    * @effect
    * @dependencies {boolean} room_calendar.isSuccess - Indicates if the calendar data fetch was successful
    * @dependencies {object} room_calendar.data - The fetched calendar data containing room categories
    * @dependencies {string} Value - The current page/offset value for pagination
-   * 
+   *
    * @description
    * - Checks if the calendar data fetch was successful and contains room categories
    * - Uses a functional state update to properly merge new room categories with existing ones
@@ -425,7 +434,6 @@ export default function Page() {
               ))}
             </InfiniteScroll>
           )}
-          
         </Card>
       </Box>
       <Box
