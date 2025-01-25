@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 // Import necessary modules and components
 import {
@@ -8,12 +8,12 @@ import {
   Box,
   Container,
   CircularProgress,
-} from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { DateRange } from "@mui/x-date-pickers-pro";
-import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
-import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
-import { Controller, useForm } from "react-hook-form";
+} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { DateRange } from '@mui/x-date-pickers-pro';
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
+import { Controller, useForm } from 'react-hook-form';
 import {
   RefObject,
   memo,
@@ -21,7 +21,7 @@ import {
   useEffect,
   useRef,
   useState,
-} from "react";
+} from 'react';
 import {
   VariableSizeList,
   ListChildComponentProps,
@@ -30,14 +30,18 @@ import {
   GridChildComponentProps,
   VariableSizeGrid,
   GridOnScrollProps,
-} from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { styled } from "@mui/material/styles";
-import dayjs from "dayjs";
-import { countDaysByMonth } from "@/utils";
-import RoomRateAvailabilityCalendar from "./(components)/RoomCalendar";
-import Navbar from "@/components/Navbar";
-import useRoomRateAvailabilityCalendar from "./(hooks)/useRoomRateAvailabilityCalendar";
+} from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { styled } from '@mui/material/styles';
+import dayjs from 'dayjs';
+import { countDaysByMonth } from '@/utils';
+import RoomRateAvailabilityCalendar from './(components)/RoomCalendar';
+import Navbar from '@/components/Navbar';
+import useRoomRateAvailabilityCalendar, {
+  IRoomCategoryCalender,
+} from './(hooks)/useRoomRateAvailabilityCalendar';
+
+import InfiniteScroll from 'react-infinite-scroll-component'; // install and import for infinite scroll
 
 // Define the form type for the date range picker
 export type CalendarForm = {
@@ -46,10 +50,10 @@ export type CalendarForm = {
 
 // Style the VariableSizeList to hide the scrollbar
 const StyledVariableSizeList = styled(VariableSizeList)({
-  scrollbarWidth: "none",
-  msOverflowStyle: "none",
-  "&::-webkit-scrollbar": {
-    display: "none",
+  scrollbarWidth: 'none',
+  msOverflowStyle: 'none',
+  '&::-webkit-scrollbar': {
+    display: 'none',
   },
 });
 
@@ -123,8 +127,8 @@ export default function Page() {
           }
         }
       };
-      rootContainer.addEventListener("wheel", handler);
-      return () => rootContainer.removeEventListener("wheel", handler);
+      rootContainer.addEventListener('wheel', handler);
+      return () => rootContainer.removeEventListener('wheel', handler);
     }
   });
 
@@ -134,13 +138,19 @@ export default function Page() {
     []
   );
 
+  // state for state value
+  const [Value, SetValue] = useState<string>('0');
+
+  // state for roomdata value
+  const [roomData, SetRoomData] = useState<IRoomCategoryCalender[]>([]);
+
   // Form control for date range picker
   const { control, watch } = useForm<CalendarForm>({
     defaultValues: {
-      date_range: [dayjs(), dayjs().add(4, "month")],
+      date_range: [dayjs(), dayjs().add(4, 'month')],
     },
   });
-  const watchedDateRange = watch("date_range");
+  const watchedDateRange = watch('date_range');
 
   // Update calendar dates and months when the date range changes
   useEffect(() => {
@@ -148,7 +158,7 @@ export default function Page() {
       watchedDateRange[0]!,
       watchedDateRange[1]
         ? watchedDateRange[1]
-        : watchedDateRange[0]!.add(2, "month")
+        : watchedDateRange[0]!.add(2, 'month')
     );
 
     setCalenderMonths(months);
@@ -158,12 +168,23 @@ export default function Page() {
   // Fetch room rate availability calendar data
   const room_calendar = useRoomRateAvailabilityCalendar({
     property_id: propertyId,
-    start_date: watchedDateRange[0]!.format("YYYY-MM-DD"),
+    start_date: watchedDateRange[0]!.format('YYYY-MM-DD'),
     end_date: (watchedDateRange[1]
       ? watchedDateRange[1]
-      : watchedDateRange[0]!.add(2, "month")
-    ).format("YYYY-MM-DD"),
+      : watchedDateRange[0]!.add(2, 'month')
+    ).format('YYYY-MM-DD'),
+    value: Value,
   });
+
+  useEffect(() => {
+    if (room_calendar.isSuccess && room_calendar.data?.data.room_categories) {
+      // Use functional state update to avoid stale state issues
+      SetRoomData((prevRoomData) => [
+        ...prevRoomData,
+        ...room_calendar.data.data.room_categories,
+      ]);
+    }
+  }, [room_calendar.isSuccess, room_calendar.data, Value]);
 
   // Component to render each month row in the calendar
   const MonthRow: React.FC<ListChildComponentProps> = memo(function MonthRowFC({
@@ -177,17 +198,17 @@ export default function Page() {
         <Box
           sx={{
             px: 1,
-            fontSize: "12px",
-            fontWeight: "bold",
-            borderLeft: "1px solid",
-            borderBottom: "1px solid",
+            fontSize: '12px',
+            fontWeight: 'bold',
+            borderLeft: '1px solid',
+            borderBottom: '1px solid',
             borderColor: theme.palette.divider,
           }}
         >
           <Box
             component="span"
             sx={{
-              position: "sticky",
+              position: 'sticky',
               left: 2,
               zIndex: 1,
             }}
@@ -210,16 +231,16 @@ export default function Page() {
         <Box
           sx={{
             pr: 1,
-            fontSize: "12px",
-            textAlign: "right",
-            fontWeight: "bold",
-            borderLeft: "1px solid",
-            borderBottom: "1px solid",
+            fontSize: '12px',
+            textAlign: 'right',
+            fontWeight: 'bold',
+            borderLeft: '1px solid',
+            borderBottom: '1px solid',
             borderColor: theme.palette.divider,
           }}
         >
-          <Box>{calenderDates[columnIndex].format("ddd")}</Box>
-          <Box>{calenderDates[columnIndex].format("DD")}</Box>
+          <Box>{calenderDates[columnIndex].format('ddd')}</Box>
+          <Box>{calenderDates[columnIndex].format('DD')}</Box>
         </Box>
       </Box>
     );
@@ -227,7 +248,7 @@ export default function Page() {
   areEqual);
 
   return (
-    <Container sx={{ backgroundColor: "#EEF2F6" }}>
+    <Container sx={{ backgroundColor: '#EEF2F6' }}>
       <Navbar />
       <Box>
         <Card elevation={1} sx={{ padding: 4, mt: 4 }}>
@@ -250,14 +271,14 @@ export default function Page() {
                 name="date_range"
                 control={control}
                 rules={{
-                  required: "Please specify a date range.",
+                  required: 'Please specify a date range.',
                 }}
                 render={({ field, fieldState: { invalid, error } }) => (
                   <DateRangePicker
                     {...field}
                     autoFocus
                     minDate={dayjs()}
-                    maxDate={dayjs().add(2, "year")}
+                    maxDate={dayjs().add(2, 'year')}
                     slots={{ field: SingleInputDateRangeField }}
                     slotProps={{
                       textField: {
@@ -316,7 +337,7 @@ export default function Page() {
           <Grid container sx={{ height: 48 }}>
             <Grid
               sx={{
-                borderBottom: "1px solid",
+                borderBottom: '1px solid',
                 borderColor: theme.palette.divider,
               }}
               size={{
@@ -355,34 +376,40 @@ export default function Page() {
               </AutoSizer>
             </Grid>
           </Grid>
-
-          {room_calendar.isSuccess
-            ? room_calendar.data.data.room_categories.map(
-                (room_category, key) => (
-                  <RoomRateAvailabilityCalendar
-                    key={key}
-                    index={key}
-                    InventoryRefs={InventoryRefs}
-                    isLastElement={
-                      key === room_calendar.data.data.room_categories.length - 1
-                    }
-                    room_category={room_category}
-                    handleCalenderScroll={handleCalenderScroll}
-                  />
-                )
-              )
-            : null}
-          {room_calendar.isLoading && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-              }}
+          {roomData.length > 0 && (
+            <InfiniteScroll
+              dataLength={roomData.length}
+              endMessage={
+                <span style={{ textAlign: 'center', marginTop: '20px' }}>
+                  <p>Scroll for read more data</p>
+                </span>
+              }
+              loader={
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              }
+              next={() => SetValue(String(parseFloat(Value) + 1))}
+              hasMore={(parseInt(Value) + 1) * 2 <= roomData.length}
             >
-              <CircularProgress />
-            </Box>
+              {roomData.map((room_category, key) => (
+                <RoomRateAvailabilityCalendar
+                  key={key}
+                  index={key}
+                  InventoryRefs={InventoryRefs}
+                  isLastElement={key === roomData.length - 1}
+                  room_category={room_category}
+                  handleCalenderScroll={handleCalenderScroll}
+                />
+              ))}
+            </InfiniteScroll>
           )}
         </Card>
       </Box>
@@ -391,8 +418,8 @@ export default function Page() {
         sx={{
           py: 3,
           px: 2,
-          mt: "auto",
-          textAlign: "center",
+          mt: 'auto',
+          textAlign: 'center',
           borderTop: `1px solid ${theme.palette.divider}`,
         }}
       >
