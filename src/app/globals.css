@@ -7,6 +7,8 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  scroll-behavior: smooth; /* added for smoother scroll */
+  -webkit-overflow-scrolling: touch; /* added for mobile behavier touch */
 }
 
 body {
@@ -28,4 +30,3 @@ a {
   color: inherit;
   text-decoration: none;
 }
-
